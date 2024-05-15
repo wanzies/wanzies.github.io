@@ -2,6 +2,12 @@
 
 ## Book Your Appointment
 
+## Barber Availability
+
+<iframe src="https://docs.google.com/spreadsheets/d/e/your_google_sheet_id/pubhtml?widget=true&amp;headers=false" width="100%" height="600" frameborder="0" style="border:0"></iframe>
+
+For any inquiries or assistance, please contact us at [info@nadaicutz.com](mailto:info@nadaicutz.com) or call us at [123-456-7890](tel:123-456-7890).
+
 Please fill out the form below to schedule your appointment:
 
 ### Contact Information
