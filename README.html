@@ -1,76 +1,241 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NadaiCutz - Book an Appointment</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-        }
-        form {
-            margin-top: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="date"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            box-sizing: border-box;
-        }
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
+<div align="center">
 
-<div class="container">
-    <h1>Welcome to NadaiCutz - Book an Appointment</h1>
-    <form action="#" method="post">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+# 🧊 FridgeSync
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+**A shared family fridge inventory manager — mobile-first, offline-capable, AI-powered.**
 
-        <label for="phone">Phone:</label>
-        <input type="tel" id="phone" name="phone" required>
+[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
+[![PWA Ready](https://img.shields.io/badge/PWA-Ready-4fd1c5?logo=pwa)](https://web.dev/progressive-web-apps/)
+[![Powered by Claude](https://img.shields.io/badge/AI-Claude%20API-a78bfa?logo=anthropic)](https://anthropic.com)
+[![No Build Step](https://img.shields.io/badge/Build-None%20required-fbbf24)](https://github.com)
 
-        <label for="date">Preferred Date:</label>
-        <input type="date" id="date" name="date" required>
+*Stop throwing away expired food. Stop buying duplicates. Keep the whole family in sync.*
 
-        <input type="submit" value="Book Appointment">
-    </form>
 </div>
 
-</body>
-</html>
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🧊 **Inventory** | Add, edit and remove fridge items with category, quantity, unit and expiry date |
+| ⏰ **Expiry Tracking** | Colour-coded alerts — red (≤1 day), amber (≤3 days), green (safe) |
+| 📷 **Barcode Scanning** | Scan a product barcode to auto-fill item details via Open Food Facts |
+| 🛒 **Shopping List** | Smart list that auto-suggests items when you remove something empty |
+| 🍳 **AI Recipes** | Claude-powered suggestions based on what's in your fridge right now |
+| 👥 **Family Members** | Invite household members via a 6-digit code; admin can remove members |
+| 🔔 **Notifications** | In-app activity log + browser push + WhatsApp fallback links |
+| 📡 **Offline Mode** | Service worker caches the app shell and last-known inventory |
+| 📱 **PWA** | Add to Home Screen on iOS Safari and Android Chrome — no app store needed |
+
+---
+
+## 📸 Screens
+
+```
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  🧊 Fridge   │  │  ⏰ Expiring │  │  🛒 Shopping │  │ 🍳 Recipes   │
+│              │  │              │  │              │  │              │
+│  15 items    │  │  ⛔ Expired  │  │ ☑ Fresh Milk │  │ Chicken Rice │
+│  3 expiring  │  │  Whole Milk  │  │ ☑ Bread      │  │ Salmon Bowl  │
+│  1 expired   │  │              │  │ ☐ Pasta      │  │ Veggie Stir  │
+│  [+ Add]     │  │  🔴 Urgent   │  │              │  │  Fry         │
+└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+```
+
+---
+
+## 🚀 Quick Start
+
+### Option A — Open directly in browser (demo only)
+
+1. Download `index.html`
+2. Open it in Chrome or Safari
+3. The app seeds a demo household automatically on first load
+
+> Note: Barcode scanning and push notifications require HTTPS. Use Option B for full functionality.
+
+### Option B — Deploy to GitHub Pages (recommended)
+
+```bash
+# 1. Clone or fork this repo
+git clone https://github.com/YOUR_USERNAME/fridgesync.git
+cd fridgesync
+
+# 2. No install needed — it's a single HTML file!
+# Just push to GitHub and enable Pages
+
+# 3. In GitHub → Settings → Pages → Source: Deploy from branch → main → / (root)
+```
+
+Your app will be live at `https://YOUR_USERNAME.github.io/fridgesync`
+
+### Option C — Deploy to Netlify (one-click)
+
+1. Fork this repo
+2. Go to [netlify.com](https://netlify.com) → **Add new site → Import from Git**
+3. Select your fork → Deploy
+
+---
+
+## 📁 Project Structure
+
+```
+fridgesync/
+├── index.html      # Entire app — HTML, CSS, JS in one file
+├── sw.js           # Service worker (offline support + push notifications)
+├── manifest.json   # PWA manifest (Add to Home Screen, theme colour, icons)
+└── README.md       # This file
+```
+
+No framework. No build step. No `node_modules`. Just open and use.
+
+---
+
+## 📱 Installing as a Mobile App (PWA)
+
+### iPhone (iOS Safari)
+1. Open the deployed URL in **Safari**
+2. Tap the **Share** button (box with arrow)
+3. Scroll down → **Add to Home Screen**
+4. Tap **Add** — FridgeSync now appears on your home screen like a native app
+
+### Android (Chrome)
+1. Open the deployed URL in **Chrome**
+2. Tap the **⋮ menu** → **Add to Home screen**
+3. Tap **Install**
+
+---
+
+## 🤖 AI Recipe Suggestions (Claude API)
+
+FridgeSync uses the [Anthropic Claude API](https://anthropic.com) to suggest recipes based on your current fridge contents, prioritising items expiring soonest.
+
+### Setup
+
+1. Get a free API key at [console.anthropic.com](https://console.anthropic.com)
+2. Open FridgeSync → tap **Recipes** tab
+3. Enter your key in the **Claude API Key** field and tap **Save**
+4. Your key is stored in `localStorage` on your device only — never sent anywhere except Anthropic's API
+
+> The app uses `claude-sonnet-4-5` with a structured JSON system prompt. Missing ingredients can be added to your shopping list with one tap.
+
+---
+
+## 📷 Barcode Scanning
+
+Barcode scanning uses the [BarcodeDetector Web API](https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector) where available (Chrome on Android, some desktop browsers), with a manual-entry fallback for iOS Safari.
+
+Product information is fetched from the [Open Food Facts API](https://world.openfoodfacts.org/api) — free, no key required.
+
+| Platform | Barcode Method |
+|---|---|
+| Chrome (Android / desktop) | `BarcodeDetector` API (native, fast) |
+| iOS Safari | Manual barcode entry fallback |
+| Firefox | Manual barcode entry fallback |
+
+---
+
+## 🔔 Notifications
+
+FridgeSync supports two notification channels:
+
+**Browser Push (Web Push API)**
+- Enable in Settings → Notifications
+- Requires HTTPS (GitHub Pages / Netlify)
+- Works on Android Chrome and desktop browsers
+- iOS Safari supports Web Push from iOS 16.4+ when installed as a PWA
+
+**WhatsApp Fallback**
+- No account or API key required
+- Generates a pre-formatted `wa.me` link
+- User taps the link to send the message to their household WhatsApp group
+- Works on any device with WhatsApp installed
+
+---
+
+## 👨‍👩‍👧 Multi-User & Household Sharing
+
+```
+1. First member creates a household → gets a 6-digit code (e.g. 482910)
+2. Share the code with family members
+3. Others open the app → Join Household → enter the code
+4. All members see the same fridge in real time
+```
+
+> **Note on data sync:** The current version stores data in `localStorage` on each device. For real-time cross-device sync, connect a Firebase Firestore backend — the data model and security rules are documented in [`FridgeSync_TechSpec.docx`](docs/FridgeSync_TechSpec.docx). The app UI and logic are fully ready for Firestore; only the data layer needs wiring up.
+
+---
+
+## 🔧 Firebase Integration (optional — for real-time sync)
+
+To enable live cross-device sync, replace the `localStorage` calls in `index.html` with Firebase Firestore:
+
+```javascript
+// 1. Add Firebase SDK to <head>
+// <script src="https://www.gstatic.com/firebasejs/10.x.x/firebase-app-compat.js"></script>
+// <script src="https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore-compat.js"></script>
+
+// 2. Initialise with your Firebase config
+const app = firebase.initializeApp({ /* your config */ });
+const db  = firebase.firestore();
+
+// 3. Replace saveState() with Firestore writes
+// db.collection('households').doc(state.householdId).set(state)
+
+// 4. Replace loadState() with onSnapshot listener
+// db.collection('households').doc(hid).onSnapshot(snap => { state = snap.data(); render(); })
+```
+
+Full Firestore data model, security rules, and index configuration are in the [Technical Specification](docs/FridgeSync_TechSpec.docx).
+
+---
+
+## 🗂️ Planning Documents
+
+The full product documentation lives in the `/docs` folder:
+
+| Document | Description |
+|---|---|
+| [`FridgeSync_PRD.docx`](docs/FridgeSync_PRD.docx) | Product Requirements — personas, feature scope, success metrics |
+| [`FridgeSync_UserStories.docx`](docs/FridgeSync_UserStories.docx) | User Stories & Acceptance Criteria (12 stories, ready for Jira/Notion) |
+| [`FridgeSync_TechSpec.docx`](docs/FridgeSync_TechSpec.docx) | Technical Specification — architecture, APIs, Firebase setup, testing checklist |
+
+---
+
+## 🛣️ Roadmap
+
+- [ ] Firebase Firestore real-time sync
+- [ ] Firebase Cloud Messaging push (server-side fan-out)
+- [ ] Multiple fridge support (fridge + freezer)
+- [ ] Item photo upload
+- [ ] Nutritional info from Open Food Facts
+- [ ] Dark/light theme toggle
+- [ ] Export inventory as CSV
+
+---
+
+## 🙏 Credits & APIs Used
+
+| Service | Purpose | Cost |
+|---|---|---|
+| [Open Food Facts](https://world.openfoodfacts.org) | Barcode product lookup | Free, no key |
+| [Anthropic Claude](https://anthropic.com) | AI recipe suggestions | Pay-per-use |
+| [Google Fonts](https://fonts.google.com) — Syne + DM Sans | Typography | Free |
+| Web Push API | Browser push notifications | Free (browser-native) |
+| BarcodeDetector API | Camera barcode scanning | Free (browser-native) |
+
+---
+
+## 📄 License
+
+MIT — do whatever you like with it. A ⭐ on the repo is always appreciated!
+
+---
+
+<div align="center">
+
+Made with ❄️ by a family, for families.
+
+</div>
