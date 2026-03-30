@@ -1,806 +1,603 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>TubeRead</title>
+<title>TubeRead v2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Playfair+Display:wght@600;700&display=swap');
 
-  :root {
-    --bg: #faf9f7;
-    --surface: #ffffff;
-    --surface2: #f3f1ee;
-    --border: #e8e5e0;
-    --text: #1a1a18;
-    --text2: #6b6860;
-    --text3: #9e9a92;
-    --accent: #e23d28;
-    --accent2: #c7311e;
-    --accent-soft: #fdf0ee;
-    --blue: #2563eb;
-    --green: #16a34a;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
-    --radius: 12px;
-    --sans: 'DM Sans', -apple-system, sans-serif;
-    --display: 'Playfair Display', Georgia, serif;
-    --max-w: 480px;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 15px;
-    line-height: 1.5;
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
-
-  /* ─── App shell ─── */
-  .app {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    min-height: 100dvh;
-    background: var(--bg);
-    position: relative;
-  }
-
-  /* ─── Top bar ─── */
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .topbar h1 {
-    font-family: var(--display);
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: -0.02em;
-  }
-
-  .topbar-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  .icon-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 16px;
-  }
-
-  .icon-btn:active { transform: scale(0.92); background: var(--surface2); }
-
-  /* ─── Screens ─── */
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  /* ─── Settings screen ─── */
-  .settings-screen {
-    padding: 16px;
-  }
-
-  .settings-group {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: var(--shadow);
-  }
-
-  .settings-group h3 {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text3);
-    margin-bottom: 10px;
-  }
-
-  .key-field { margin-bottom: 10px; }
-  .key-field:last-child { margin-bottom: 0; }
-
-  .key-field label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text2);
-    margin-bottom: 4px;
-  }
-
-  .key-field input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 0.8rem;
-    background: var(--surface2);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  .key-field input:focus { border-color: var(--accent); }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    font-family: var(--sans);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .btn:active { transform: scale(0.96); }
-
-  .btn-primary {
-    background: var(--accent);
-    color: white;
-    width: 100%;
-  }
-
-  .btn-primary:hover { background: var(--accent2); }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-  }
-
-  .btn-small {
-    padding: 6px 14px;
-    font-size: 0.78rem;
-  }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--text2);
-    padding: 6px 10px;
-    font-size: 0.78rem;
-  }
-
-  /* ─── Channel stories row ─── */
-  .stories-row {
-    display: flex;
-    gap: 12px;
-    padding: 14px 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .stories-row::-webkit-scrollbar { display: none; }
-
-  .story-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    min-width: 64px;
-    cursor: pointer;
-  }
-
-  .story-avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    overflow: hidden;
-    transition: border-color 0.15s;
-    background: var(--surface2);
-  }
-
-  .story-item.active .story-avatar,
-  .story-item:active .story-avatar {
-    border-color: var(--accent);
-  }
-
-  .story-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .story-name {
-    font-size: 0.65rem;
-    font-weight: 500;
-    color: var(--text2);
-    max-width: 64px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: center;
-  }
-
-  .story-item.all-item .story-avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    background: var(--accent-soft);
-    border-color: var(--accent);
-  }
-
-  /* ─── Feed ─── */
-  .feed {
-    padding-bottom: 80px;
-  }
-
-  .feed-empty {
-    text-align: center;
-    padding: 60px 32px;
-  }
-
-  .feed-empty .emoji { font-size: 3rem; margin-bottom: 12px; }
-
-  .feed-empty h2 {
-    font-family: var(--display);
-    font-size: 1.2rem;
-    margin-bottom: 6px;
-  }
-
-  .feed-empty p {
-    color: var(--text2);
-    font-size: 0.85rem;
-    margin-bottom: 20px;
-  }
-
-  /* ─── Video card ─── */
-  .card {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    animation: cardIn 0.35s ease both;
-  }
-
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-  }
-
-  .card-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    background: var(--surface2);
-  }
-
-  .card-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  .card-channel {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .card-date {
-    font-size: 0.7rem;
-    color: var(--text3);
-  }
-
-  .card-thumb {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: var(--surface2);
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-  }
-
-  .card-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s;
-  }
-
-  .card-thumb:active img { transform: scale(1.02); }
-
-  .play-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.2);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .card-thumb:hover .play-overlay { opacity: 1; }
-
-  .play-btn-overlay {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.4rem;
-    backdrop-filter: blur(4px);
-  }
-
-  .card-duration {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
-  }
-
-  .card-body {
-    padding: 12px 16px 14px;
-  }
-
-  .card-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    line-height: 1.35;
-    margin-bottom: 6px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-caption {
-    font-size: 0.82rem;
-    color: var(--text2);
-    line-height: 1.5;
-    margin-bottom: 4px;
-  }
-
-  .card-caption.collapsed {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .read-more-btn {
-    background: none;
-    border: none;
-    color: var(--accent);
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 4px 0;
-  }
-
-  .card-detail {
-    display: none;
-    padding: 0 16px 14px;
-    animation: expandIn 0.3s ease;
-  }
-
-  .card-detail.visible { display: block; }
-
-  @keyframes expandIn {
-    from { opacity: 0; max-height: 0; }
-    to { opacity: 1; max-height: 2000px; }
-  }
-
-  .detail-summary {
-    font-size: 0.85rem;
-    color: var(--text);
-    line-height: 1.65;
-    white-space: pre-wrap;
-    padding: 12px;
-    background: var(--surface2);
-    border-radius: 8px;
-    border-left: 3px solid var(--accent);
-  }
-
-  .detail-loading {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px;
-    background: var(--surface2);
-    border-radius: 8px;
-    color: var(--text3);
-    font-size: 0.82rem;
-  }
-
-  .mini-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .card-actions {
-    display: flex;
-    gap: 16px;
-    padding: 0 16px 12px;
-  }
-
-  .card-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: none;
-    border: none;
-    font-family: var(--sans);
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--text2);
-    cursor: pointer;
-    padding: 4px 0;
-  }
-
-  .card-action-btn:active { color: var(--accent); }
-
-  /* ─── Video player overlay ─── */
-  .player-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0,0,0,0.92);
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-
-  .player-overlay.visible { display: flex; }
-
-  .player-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.15);
-    color: white;
-    font-size: 1.2rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .player-container {
-    width: 100%;
-    max-width: var(--max-w);
-    aspect-ratio: 16/9;
-  }
-
-  .player-container iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 8px;
-  }
-
-  /* ─── Search overlay ─── */
-  .search-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 150;
-    background: var(--bg);
-    flex-direction: column;
-  }
-
-  .search-overlay.visible { display: flex; }
-
-  .search-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .search-bar input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    font-family: var(--sans);
-    font-size: 0.9rem;
-    background: var(--surface2);
-    color: var(--text);
-    outline: none;
-  }
-
-  .search-bar input:focus { border-color: var(--accent); }
-
-  .search-cancel {
-    background: none;
-    border: none;
-    font-family: var(--sans);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--accent);
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .search-results {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 0;
-  }
-
-  .search-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: background 0.1s;
-  }
-
-  .search-item:active { background: var(--surface2); }
-
-  .search-item-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    background: var(--surface2);
-  }
-
-  .search-item-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  .search-item-info { flex: 1; min-width: 0; }
-
-  .search-item-name {
-    font-size: 0.88rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .search-item-bio {
-    font-size: 0.75rem;
-    color: var(--text2);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.35;
-  }
-
-  .search-item-sub {
-    font-size: 0.7rem;
-    color: var(--text3);
-    margin-top: 2px;
-  }
-
-  .sub-btn {
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-family: var(--sans);
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-
-  .sub-btn.subscribe {
-    background: var(--accent);
-    color: white;
-  }
-
-  .sub-btn.subscribed {
-    background: var(--surface2);
-    color: var(--text2);
-    border: 1px solid var(--border);
-  }
-
-  .search-empty {
-    text-align: center;
-    padding: 40px 16px;
-    color: var(--text3);
-    font-size: 0.85rem;
-  }
-
-  .search-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 24px;
-    color: var(--text3);
-    font-size: 0.82rem;
-  }
-
-  /* ─── Manage channels screen ─── */
-  .manage-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .manage-item-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--surface2);
-  }
-
-  .manage-item-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  .manage-item-info { flex: 1; }
-
-  .manage-item-name { font-size: 0.85rem; font-weight: 600; }
-  .manage-item-subs { font-size: 0.72rem; color: var(--text3); }
-
-  .delete-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid #e8e5e0;
-    background: white;
-    color: var(--accent);
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .delete-btn:active { background: var(--accent-soft); }
-
-  /* ─── Feed loading ─── */
-  .feed-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 40px;
-    color: var(--text3);
-    font-size: 0.82rem;
-  }
-
-  .feed-loading .spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-  }
-
-  /* ─── Bottom nav ─── */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: var(--max-w);
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    z-index: 100;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    padding: 8px 0;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: var(--sans);
-    color: var(--text3);
-    transition: color 0.15s;
-  }
-
-  .nav-item.active { color: var(--accent); }
-
-  .nav-item .nav-icon { font-size: 1.2rem; }
-  .nav-item .nav-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-
-  /* ─── Toast ─── */
-  .toast {
-    position: fixed;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text);
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 500;
-    padding: 10px 20px;
-    border-radius: 24px;
-    z-index: 300;
-    opacity: 0;
-    transition: all 0.3s;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+:root {
+–bg: #faf9f7;
+–surface: #ffffff;
+–surface2: #f3f1ee;
+–border: #e8e5e0;
+–text: #1a1a18;
+–text2: #6b6860;
+–text3: #9e9a92;
+–accent: #e23d28;
+–accent2: #c7311e;
+–accent-soft: #fdf0ee;
+–green: #16a34a;
+–shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+–radius: 12px;
+–sans: ‘DM Sans’, -apple-system, sans-serif;
+–display: ‘Playfair Display’, Georgia, serif;
+–max-w: 480px;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: var(–sans);
+font-size: 15px;
+line-height: 1.5;
+min-height: 100dvh;
+overflow-x: hidden;
+}
+
+.app {
+max-width: var(–max-w);
+margin: 0 auto;
+min-height: 100dvh;
+background: var(–bg);
+position: relative;
+}
+
+/* ─── Top bar ─── */
+.topbar {
+position: sticky;
+top: 0;
+z-index: 100;
+background: var(–bg);
+border-bottom: 1px solid var(–border);
+padding: 12px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.topbar h1 {
+font-family: var(–display);
+font-size: 1.35rem;
+font-weight: 700;
+color: var(–accent);
+letter-spacing: -0.02em;
+}
+
+.topbar h1 span {
+font-family: var(–sans);
+font-size: 0.55rem;
+font-weight: 500;
+color: var(–text3);
+vertical-align: super;
+margin-left: 3px;
+letter-spacing: 0.02em;
+}
+
+.topbar-actions { display: flex; gap: 8px; }
+
+.icon-btn {
+width: 36px; height: 36px;
+border-radius: 50%;
+border: 1px solid var(–border);
+background: var(–surface);
+display: flex; align-items: center; justify-content: center;
+cursor: pointer;
+transition: all 0.15s;
+font-size: 16px;
+}
+
+.icon-btn:active { transform: scale(0.92); background: var(–surface2); }
+
+/* ─── Screens ─── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ─── Settings ─── */
+.settings-screen { padding: 16px; }
+
+.settings-group {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 16px;
+margin-bottom: 12px;
+box-shadow: var(–shadow);
+}
+
+.settings-group h3 {
+font-size: 0.7rem; font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+color: var(–text3);
+margin-bottom: 10px;
+}
+
+.key-field { margin-bottom: 10px; }
+.key-field:last-child { margin-bottom: 0; }
+
+.key-field label {
+display: block; font-size: 0.75rem;
+font-weight: 500; color: var(–text2);
+margin-bottom: 4px;
+}
+
+.key-field input {
+width: 100%; padding: 10px 12px;
+border: 1px solid var(–border);
+border-radius: 8px;
+font-family: monospace; font-size: 0.8rem;
+background: var(–surface2); color: var(–text);
+outline: none; transition: border-color 0.15s;
+}
+
+.key-field input:focus { border-color: var(–accent); }
+
+.btn {
+display: inline-flex; align-items: center; justify-content: center;
+gap: 6px; padding: 10px 20px; border-radius: 8px; border: none;
+font-family: var(–sans); font-size: 0.85rem; font-weight: 600;
+cursor: pointer; transition: all 0.15s;
+}
+
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: var(–accent); color: white; width: 100%; }
+.btn-primary:hover { background: var(–accent2); }
+
+/* ─── Stories row ─── */
+.stories-row {
+display: flex; gap: 12px; padding: 14px 16px;
+overflow-x: auto; scrollbar-width: none;
+border-bottom: 1px solid var(–border);
+}
+
+.stories-row::-webkit-scrollbar { display: none; }
+
+.story-item {
+display: flex; flex-direction: column;
+align-items: center; gap: 4px;
+min-width: 64px; cursor: pointer;
+}
+
+.story-avatar {
+width: 56px; height: 56px;
+border-radius: 50%;
+border: 2px solid var(–border);
+overflow: hidden;
+transition: border-color 0.15s;
+background: var(–surface2);
+}
+
+.story-item.active .story-avatar { border-color: var(–accent); }
+.story-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.story-name {
+font-size: 0.65rem; font-weight: 500; color: var(–text2);
+max-width: 64px; overflow: hidden; text-overflow: ellipsis;
+white-space: nowrap; text-align: center;
+}
+
+.story-item.all-item .story-avatar {
+display: flex; align-items: center; justify-content: center;
+font-size: 1.2rem; background: var(–accent-soft);
+border-color: var(–accent);
+}
+
+/* ─── Feed ─── */
+.feed { padding-bottom: 80px; }
+
+.feed-empty {
+text-align: center; padding: 60px 32px;
+}
+
+.feed-empty .emoji { font-size: 3rem; margin-bottom: 12px; }
+
+.feed-empty h2 {
+font-family: var(–display); font-size: 1.2rem; margin-bottom: 6px;
+}
+
+.feed-empty p {
+color: var(–text2); font-size: 0.85rem; margin-bottom: 20px;
+}
+
+/* ─── Card ─── */
+.card {
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+animation: cardIn 0.35s ease both;
+}
+
+@keyframes cardIn {
+from { opacity: 0; transform: translateY(12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+display: flex; align-items: center; gap: 10px;
+padding: 12px 16px;
+}
+
+.card-avatar {
+width: 32px; height: 32px; border-radius: 50%;
+overflow: hidden; flex-shrink: 0; background: var(–surface2);
+}
+
+.card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.card-channel { font-size: 0.82rem; font-weight: 600; }
+.card-date { font-size: 0.7rem; color: var(–text3); }
+
+.card-thumb {
+width: 100%; aspect-ratio: 16/9;
+background: var(–surface2);
+position: relative; cursor: pointer; overflow: hidden;
+}
+
+.card-thumb img {
+width: 100%; height: 100%; object-fit: cover;
+transition: transform 0.3s;
+}
+
+.card-thumb:active img { transform: scale(1.02); }
+
+.play-overlay {
+position: absolute; inset: 0;
+display: flex; align-items: center; justify-content: center;
+background: rgba(0,0,0,0.2);
+opacity: 0; transition: opacity 0.2s;
+}
+
+.card-thumb:hover .play-overlay { opacity: 1; }
+
+.play-btn-overlay {
+width: 56px; height: 56px; border-radius: 50%;
+background: rgba(0,0,0,0.7);
+display: flex; align-items: center; justify-content: center;
+color: white; font-size: 1.4rem;
+backdrop-filter: blur(4px);
+}
+
+.card-duration {
+position: absolute; bottom: 8px; right: 8px;
+background: rgba(0,0,0,0.8); color: white;
+font-size: 0.7rem; font-weight: 600;
+padding: 2px 6px; border-radius: 4px;
+font-family: monospace;
+}
+
+.card-body { padding: 12px 16px 6px; }
+
+.card-title {
+font-size: 0.9rem; font-weight: 600; line-height: 1.35;
+margin-bottom: 8px;
+}
+
+/* ─── Inline content area ─── */
+.card-content {
+font-size: 0.84rem;
+color: var(–text2);
+line-height: 1.6;
+padding: 0 16px 14px;
+white-space: pre-wrap;
+}
+
+.card-content.narration {
+font-size: 0.88rem;
+color: var(–text);
+line-height: 1.7;
+background: var(–surface2);
+margin: 0 12px 12px;
+padding: 14px;
+border-radius: 10px;
+border-left: 3px solid var(–accent);
+}
+
+.content-loading {
+display: flex; align-items: center; gap: 8px;
+color: var(–text3); font-size: 0.8rem;
+padding: 8px 0;
+}
+
+.mini-spinner {
+width: 14px; height: 14px;
+border: 2px solid var(–border);
+border-top-color: var(–accent);
+border-radius: 50%;
+animation: spin 0.6s linear infinite;
+flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.detail-badge {
+display: inline-block;
+font-size: 0.6rem;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+padding: 2px 7px;
+border-radius: 4px;
+margin-bottom: 6px;
+}
+
+.detail-badge.tldr { background: #e8f5e9; color: #2e7d32; }
+.detail-badge.brief { background: #e3f2fd; color: #1565c0; }
+.detail-badge.narration { background: var(–accent-soft); color: var(–accent); }
+
+.card-actions {
+display: flex; gap: 16px; padding: 0 16px 12px;
+}
+
+.card-action-btn {
+display: flex; align-items: center; gap: 5px;
+background: none; border: none;
+font-family: var(–sans); font-size: 0.78rem;
+font-weight: 500; color: var(–text2);
+cursor: pointer; padding: 4px 0;
+}
+
+.card-action-btn:active { color: var(–accent); }
+
+/* ─── Player overlay ─── */
+.player-overlay {
+display: none; position: fixed; inset: 0; z-index: 200;
+background: rgba(0,0,0,0.92);
+align-items: center; justify-content: center; flex-direction: column;
+}
+
+.player-overlay.visible { display: flex; }
+
+.player-close {
+position: absolute; top: 12px; right: 12px;
+width: 36px; height: 36px; border-radius: 50%; border: none;
+background: rgba(255,255,255,0.15); color: white;
+font-size: 1.2rem; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+}
+
+.player-container {
+width: 100%; max-width: var(–max-w); aspect-ratio: 16/9;
+}
+
+.player-container iframe {
+width: 100%; height: 100%; border: none; border-radius: 8px;
+}
+
+/* ─── Search overlay ─── */
+.search-overlay {
+display: none; position: fixed; inset: 0; z-index: 150;
+background: var(–bg); flex-direction: column;
+}
+
+.search-overlay.visible { display: flex; }
+
+.search-bar {
+display: flex; align-items: center; gap: 8px;
+padding: 12px 16px; border-bottom: 1px solid var(–border);
+}
+
+.search-bar input {
+flex: 1; padding: 10px 14px;
+border: 1px solid var(–border); border-radius: 24px;
+font-family: var(–sans); font-size: 0.9rem;
+background: var(–surface2); color: var(–text); outline: none;
+}
+
+.search-bar input:focus { border-color: var(–accent); }
+
+.search-cancel {
+background: none; border: none;
+font-family: var(–sans); font-size: 0.85rem;
+font-weight: 500; color: var(–accent);
+cursor: pointer; white-space: nowrap;
+}
+
+.search-results { flex: 1; overflow-y: auto; padding: 8px 0; }
+
+.search-item {
+display: flex; align-items: center; gap: 12px;
+padding: 10px 16px; cursor: pointer; transition: background 0.1s;
+}
+
+.search-item:active { background: var(–surface2); }
+
+.search-item-avatar {
+width: 44px; height: 44px; border-radius: 50%;
+overflow: hidden; flex-shrink: 0; background: var(–surface2);
+}
+
+.search-item-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.search-item-info { flex: 1; min-width: 0; }
+
+.search-item-name {
+font-size: 0.88rem; font-weight: 600;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.search-item-bio {
+font-size: 0.75rem; color: var(–text2);
+display: -webkit-box; -webkit-line-clamp: 2;
+-webkit-box-orient: vertical; overflow: hidden; line-height: 1.35;
+}
+
+.search-item-sub { font-size: 0.7rem; color: var(–text3); margin-top: 2px; }
+
+.sub-btn {
+padding: 6px 16px; border-radius: 6px;
+font-family: var(–sans); font-size: 0.75rem; font-weight: 600;
+cursor: pointer; border: none; transition: all 0.15s; flex-shrink: 0;
+}
+
+.sub-btn.subscribe { background: var(–accent); color: white; }
+.sub-btn.subscribed { background: var(–surface2); color: var(–text2); border: 1px solid var(–border); }
+
+.search-empty, .search-loading {
+text-align: center; padding: 40px 16px; color: var(–text3); font-size: 0.85rem;
+}
+
+.search-loading {
+display: flex; align-items: center; justify-content: center; gap: 8px;
+padding: 24px;
+}
+
+/* ─── Manage channels ─── */
+.manage-item {
+display: flex; align-items: flex-start; gap: 12px;
+padding: 14px 16px;
+border-bottom: 1px solid var(–border);
+background: var(–surface);
+}
+
+.manage-item-avatar {
+width: 44px; height: 44px; border-radius: 50%;
+overflow: hidden; background: var(–surface2); flex-shrink: 0;
+}
+
+.manage-item-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.manage-item-info { flex: 1; min-width: 0; }
+.manage-item-name { font-size: 0.88rem; font-weight: 600; }
+.manage-item-subs { font-size: 0.72rem; color: var(–text3); margin-bottom: 8px; }
+
+/* Detail level selector */
+.detail-selector {
+display: flex; gap: 0; border-radius: 8px;
+overflow: hidden; border: 1px solid var(–border);
+}
+
+.detail-option {
+flex: 1; padding: 7px 4px;
+text-align: center; font-family: var(–sans);
+font-size: 0.68rem; font-weight: 600;
+cursor: pointer; border: none;
+background: var(–surface2); color: var(–text3);
+transition: all 0.15s;
+border-right: 1px solid var(–border);
+}
+
+.detail-option:last-child { border-right: none; }
+
+.detail-option.active {
+background: var(–accent);
+color: white;
+}
+
+.detail-option:active { opacity: 0.8; }
+
+.delete-btn {
+width: 32px; height: 32px; border-radius: 50%;
+border: 1px solid var(–border); background: white;
+color: var(–accent); font-size: 1rem; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0; margin-top: 6px;
+}
+
+.delete-btn:active { background: var(–accent-soft); }
+
+/* ─── Feed loading ─── */
+.feed-loading {
+display: flex; flex-direction: column; align-items: center;
+gap: 8px; padding: 40px; color: var(–text3); font-size: 0.82rem;
+}
+
+.feed-loading .spinner {
+width: 24px; height: 24px;
+border: 2px solid var(–border);
+border-top-color: var(–accent);
+border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+
+/* ─── Generation progress bar ─── */
+.gen-progress {
+display: none;
+padding: 12px 16px;
+background: var(–accent-soft);
+border-bottom: 1px solid var(–border);
+}
+
+.gen-progress.visible { display: block; }
+
+.gen-progress-text {
+font-size: 0.75rem; font-weight: 500; color: var(–accent);
+margin-bottom: 6px;
+}
+
+.gen-bar {
+height: 3px; background: var(–border); border-radius: 2px;
+overflow: hidden;
+}
+
+.gen-bar-fill {
+height: 100%; background: var(–accent);
+border-radius: 2px; transition: width 0.3s;
+width: 0%;
+}
+
+/* ─── Bottom nav ─── */
+.bottom-nav {
+position: fixed; bottom: 0; left: 50%;
+transform: translateX(-50%); width: 100%; max-width: var(–max-w);
+background: var(–surface); border-top: 1px solid var(–border);
+display: flex; z-index: 100;
+padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.nav-item {
+flex: 1; display: flex; flex-direction: column;
+align-items: center; gap: 2px; padding: 8px 0;
+cursor: pointer; border: none; background: none;
+font-family: var(–sans); color: var(–text3); transition: color 0.15s;
+}
+
+.nav-item.active { color: var(–accent); }
+.nav-item .nav-icon { font-size: 1.2rem; }
+.nav-item .nav-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ─── Toast ─── */
+.toast {
+position: fixed; bottom: 70px; left: 50%;
+transform: translateX(-50%) translateY(20px);
+background: var(–text); color: white;
+font-size: 0.8rem; font-weight: 500;
+padding: 10px 20px; border-radius: 24px;
+z-index: 300; opacity: 0; transition: all 0.3s;
+pointer-events: none; white-space: nowrap;
+}
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
+
 </head>
 <body>
 
 <div class="app" id="app">
-  <!-- Top bar -->
   <div class="topbar">
-    <h1>TubeRead</h1>
+    <h1>TubeRead <span>v2</span></h1>
     <div class="topbar-actions">
       <button class="icon-btn" id="searchBtn" title="Find channels">🔍</button>
       <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
     </div>
   </div>
 
-  <!-- ═══ Feed screen ═══ -->
+  <!-- Feed screen -->
+
   <div class="screen active" id="feedScreen">
     <div class="stories-row" id="storiesRow"></div>
+    <div class="gen-progress" id="genProgress">
+      <div class="gen-progress-text" id="genProgressText">Generating summaries...</div>
+      <div class="gen-bar"><div class="gen-bar-fill" id="genBarFill"></div></div>
+    </div>
     <div class="feed" id="feed"></div>
   </div>
 
-  <!-- ═══ Manage screen ═══ -->
+  <!-- Manage screen -->
+
   <div class="screen" id="manageScreen">
-    <div style="padding:16px;">
-      <h2 style="font-family:var(--display);font-size:1.15rem;margin-bottom:12px;">Your Channels</h2>
+    <div style="padding:16px 0;">
+      <h2 style="font-family:var(--display);font-size:1.15rem;margin-bottom:4px;padding:0 16px;">Your Channels</h2>
+      <p style="font-size:0.78rem;color:var(--text3);padding:0 16px;margin-bottom:12px;">Set detail level per channel. Changes regenerate summaries.</p>
       <div id="manageList"></div>
       <div id="manageEmpty" style="display:none;text-align:center;padding:40px 16px;color:var(--text3);font-size:0.85rem;">
         No channels yet. Tap 🔍 to discover.
@@ -808,7 +605,8 @@
     </div>
   </div>
 
-  <!-- ═══ Settings screen ═══ -->
+  <!-- Settings screen -->
+
   <div class="screen" id="settingsScreen">
     <div class="settings-screen">
       <h2 style="font-family:var(--display);font-size:1.15rem;margin-bottom:12px;">Settings</h2>
@@ -832,7 +630,6 @@
     </div>
   </div>
 
-  <!-- Bottom nav -->
   <div class="bottom-nav">
     <button class="nav-item active" data-screen="feedScreen">
       <span class="nav-icon">📰</span><span class="nav-label">Feed</span>
@@ -847,6 +644,7 @@
 </div>
 
 <!-- Search overlay -->
+
 <div class="search-overlay" id="searchOverlay">
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search YouTube channels..." autocomplete="off" />
@@ -857,7 +655,8 @@
   </div>
 </div>
 
-<!-- Video player overlay -->
+<!-- Video player -->
+
 <div class="player-overlay" id="playerOverlay">
   <button class="player-close" id="playerClose">✕</button>
   <div class="player-container">
@@ -865,7 +664,6 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -873,11 +671,20 @@
 //  STATE
 // ═══════════════════════════════════════════
 var keys = { yt: '', claude: '', apify: '' };
-var channels = []; // [{id, title, thumb, description, subs}]
+// channels: [{id, title, thumb, description, subs, detailLevel: 'tldr'|'brief'|'narration'}]
+var channels = [];
 var videoCache = {}; // channelId -> [videos]
-var summaryCache = {}; // videoId -> { brief, full }
-var activeFilter = null; // null = all, channelId = filter
+// summaryCache: { videoId: { tldr: '...', brief: '...', narration: '...' } }
+var summaryCache = {};
+var activeFilter = null;
 var searchTimer = null;
+var isGenerating = false;
+
+var DETAIL_LEVELS = {
+  tldr: { label: 'TLDR', badge: 'tldr' },
+  brief: { label: 'Brief', badge: 'brief' },
+  narration: { label: 'Narration', badge: 'narration' }
+};
 
 // ═══════════════════════════════════════════
 //  HELPERS
@@ -919,12 +726,20 @@ function parseDuration(iso) {
   return min + ':' + String(s).padStart(2,'0');
 }
 
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escAttr(s) { return (s||'').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
 async function ytFetch(endpoint, params) {
   params.key = keys.yt;
   var qs = Object.keys(params).map(function(k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
   var res = await fetch('https://www.googleapis.com/youtube/v3/' + endpoint + '?' + qs);
   if (!res.ok) throw new Error('YouTube API ' + res.status);
   return res.json();
+}
+
+function getChannelDetailLevel(channelId) {
+  var ch = channels.find(function(c) { return c.id === channelId; });
+  return ch ? (ch.detailLevel || 'tldr') : 'tldr';
 }
 
 // ═══════════════════════════════════════════
@@ -941,49 +756,50 @@ function showScreen(id) {
 }
 
 document.querySelectorAll('.nav-item').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    showScreen(this.getAttribute('data-screen'));
-  });
+  btn.addEventListener('click', function() { showScreen(this.getAttribute('data-screen')); });
 });
 
 // ═══════════════════════════════════════════
-//  SETTINGS / KEYS
+//  PERSISTENCE
 // ═══════════════════════════════════════════
 function loadState() {
   try {
-    var k = JSON.parse(localStorage.getItem('tr_keys') || '{}');
-    keys.yt = k.yt || '';
-    keys.claude = k.claude || '';
-    keys.apify = k.apify || '';
-    channels = JSON.parse(localStorage.getItem('tr_channels') || '[]');
-    summaryCache = JSON.parse(localStorage.getItem('tr_summaries') || '{}');
+    var k = JSON.parse(localStorage.getItem('tr2_keys') || '{}');
+    keys.yt = k.yt || ''; keys.claude = k.claude || ''; keys.apify = k.apify || '';
+    channels = JSON.parse(localStorage.getItem('tr2_channels') || '[]');
+    summaryCache = JSON.parse(localStorage.getItem('tr2_summaries') || '{}');
   } catch(e) {}
   document.getElementById('sYtKey').value = keys.yt;
   document.getElementById('sClaudeKey').value = keys.claude;
   document.getElementById('sApifyKey').value = keys.apify;
 }
 
-function saveKeys() {
+function saveChannels() {
+  localStorage.setItem('tr2_channels', JSON.stringify(channels));
+}
+
+function saveSummaries() {
+  localStorage.setItem('tr2_summaries', JSON.stringify(summaryCache));
+}
+
+document.getElementById('saveKeysBtn').addEventListener('click', function() {
   keys.yt = document.getElementById('sYtKey').value.trim();
   keys.claude = document.getElementById('sClaudeKey').value.trim();
   keys.apify = document.getElementById('sApifyKey').value.trim();
-  localStorage.setItem('tr_keys', JSON.stringify(keys));
+  localStorage.setItem('tr2_keys', JSON.stringify(keys));
   var missing = [];
   if (!keys.yt) missing.push('YouTube');
   if (!keys.claude) missing.push('Claude');
   if (!keys.apify) missing.push('Apify');
-  var status = document.getElementById('keysStatus');
+  var el = document.getElementById('keysStatus');
   if (missing.length === 0) {
-    status.textContent = 'All keys saved.';
-    status.style.color = 'var(--green)';
+    el.textContent = 'All keys saved.'; el.style.color = 'var(--green)';
     toast('Keys saved');
   } else {
-    status.textContent = 'Missing: ' + missing.join(', ');
-    status.style.color = 'var(--accent)';
+    el.textContent = 'Missing: ' + missing.join(', '); el.style.color = 'var(--accent)';
   }
-}
+});
 
-document.getElementById('saveKeysBtn').addEventListener('click', saveKeys);
 document.getElementById('settingsBtn').addEventListener('click', function() { showScreen('settingsScreen'); });
 
 // ═══════════════════════════════════════════
@@ -1022,13 +838,10 @@ async function searchChannels(query) {
       document.getElementById('searchResults').innerHTML = '<div class="search-empty">No channels found</div>';
       return;
     }
-    // Get channel details for subscriber counts
     var ids = data.items.map(function(i) { return i.snippet.channelId; }).join(',');
     var details = await ytFetch('channels', { part: 'snippet,statistics', id: ids });
     var detailMap = {};
-    if (details.items) {
-      details.items.forEach(function(c) { detailMap[c.id] = c; });
-    }
+    if (details.items) details.items.forEach(function(c) { detailMap[c.id] = c; });
     renderSearchResults(data.items, detailMap);
   } catch (err) {
     document.getElementById('searchResults').innerHTML = '<div class="search-empty">Error: ' + err.message + '</div>';
@@ -1045,7 +858,7 @@ function renderSearchResults(items, detailMap) {
     var subs = detail && detail.statistics ? formatCount(detail.statistics.subscriberCount) + ' subscribers' : '';
     var isSub = channels.some(function(c) { return c.id === chId; });
 
-    html += '<div class="search-item" data-chid="' + chId + '">';
+    html += '<div class="search-item">';
     html += '<div class="search-item-avatar"><img src="' + thumb + '" alt="" /></div>';
     html += '<div class="search-item-info">';
     html += '<div class="search-item-name">' + escHtml(item.snippet.title) + '</div>';
@@ -1073,31 +886,29 @@ function renderSearchResults(items, detailMap) {
           title: this.getAttribute('data-title'),
           thumb: this.getAttribute('data-thumb'),
           description: this.getAttribute('data-desc'),
-          subs: this.getAttribute('data-subs')
+          subs: this.getAttribute('data-subs'),
+          detailLevel: 'tldr'
         });
         this.className = 'sub-btn subscribed';
         this.textContent = 'Following';
-        toast('Following!');
-        delete videoCache[chId]; // force refresh
+        toast('Following! Generating summaries...');
+        delete videoCache[chId];
+        // Pre-generate summaries for this channel
+        preGenerateChannel(chId);
       }
-      localStorage.setItem('tr_channels', JSON.stringify(channels));
+      saveChannels();
       renderStories();
     });
   });
 }
-
-function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-function escAttr(s) { return (s||'').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 
 // ═══════════════════════════════════════════
 //  STORIES ROW
 // ═══════════════════════════════════════════
 function renderStories() {
   var row = document.getElementById('storiesRow');
-  if (channels.length === 0) {
-    row.innerHTML = '';
-    return;
-  }
+  if (channels.length === 0) { row.innerHTML = ''; return; }
+
   var html = '<div class="story-item all-item' + (activeFilter === null ? ' active' : '') + '" data-filter="all">';
   html += '<div class="story-avatar">✦</div>';
   html += '<div class="story-name">All</div></div>';
@@ -1109,7 +920,6 @@ function renderStories() {
   });
 
   row.innerHTML = html;
-
   row.querySelectorAll('.story-item').forEach(function(item) {
     item.addEventListener('click', function() {
       var f = this.getAttribute('data-filter');
@@ -1126,49 +936,75 @@ function renderStories() {
 function renderManageList() {
   var list = document.getElementById('manageList');
   var empty = document.getElementById('manageEmpty');
-  if (channels.length === 0) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (channels.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
+
   var html = '';
   channels.forEach(function(ch) {
+    var dl = ch.detailLevel || 'tldr';
     html += '<div class="manage-item">';
     html += '<div class="manage-item-avatar"><img src="' + ch.thumb + '" alt="" /></div>';
     html += '<div class="manage-item-info">';
     html += '<div class="manage-item-name">' + escHtml(ch.title) + '</div>';
     html += '<div class="manage-item-subs">' + (ch.subs || '') + '</div>';
+    html += '<div class="detail-selector" data-chid="' + ch.id + '">';
+    html += '<button class="detail-option' + (dl === 'tldr' ? ' active' : '') + '" data-level="tldr">TLDR</button>';
+    html += '<button class="detail-option' + (dl === 'brief' ? ' active' : '') + '" data-level="brief">Brief</button>';
+    html += '<button class="detail-option' + (dl === 'narration' ? ' active' : '') + '" data-level="narration">Narration</button>';
+    html += '</div>';
     html += '</div>';
     html += '<button class="delete-btn" data-chid="' + ch.id + '" title="Unfollow">✕</button>';
     html += '</div>';
   });
   list.innerHTML = html;
 
+  // Delete handlers
   list.querySelectorAll('.delete-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var chId = this.getAttribute('data-chid');
       channels = channels.filter(function(c) { return c.id !== chId; });
-      localStorage.setItem('tr_channels', JSON.stringify(channels));
+      saveChannels();
       renderManageList();
       renderStories();
       toast('Channel removed');
     });
   });
+
+  // Detail level handlers
+  list.querySelectorAll('.detail-option').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var selector = this.closest('.detail-selector');
+      var chId = selector.getAttribute('data-chid');
+      var newLevel = this.getAttribute('data-level');
+      var ch = channels.find(function(c) { return c.id === chId; });
+      if (!ch || ch.detailLevel === newLevel) return;
+
+      var oldLevel = ch.detailLevel;
+      ch.detailLevel = newLevel;
+      saveChannels();
+
+      // Update UI
+      selector.querySelectorAll('.detail-option').forEach(function(o) {
+        o.classList.toggle('active', o.getAttribute('data-level') === newLevel);
+      });
+
+      toast('Switched to ' + DETAIL_LEVELS[newLevel].label + '. Regenerating...');
+
+      // Pre-generate for new level
+      preGenerateChannel(chId);
+    });
+  });
 }
 
 // ═══════════════════════════════════════════
-//  FEED
+//  FETCH VIDEOS
 // ═══════════════════════════════════════════
 async function fetchChannelVideos(channelId) {
   if (videoCache[channelId]) return videoCache[channelId];
 
   var searchData = await ytFetch('search', {
-    part: 'snippet',
-    channelId: channelId,
-    order: 'date',
-    type: 'video',
-    maxResults: 5
+    part: 'snippet', channelId: channelId,
+    order: 'date', type: 'video', maxResults: 5
   });
 
   if (!searchData.items || searchData.items.length === 0) {
@@ -1197,6 +1033,151 @@ async function fetchChannelVideos(channelId) {
   return videos;
 }
 
+// ═══════════════════════════════════════════
+//  PRE-GENERATE SUMMARIES
+// ═══════════════════════════════════════════
+function showGenProgress(text, pct) {
+  var el = document.getElementById('genProgress');
+  el.classList.add('visible');
+  document.getElementById('genProgressText').textContent = text;
+  document.getElementById('genBarFill').style.width = pct + '%';
+}
+
+function hideGenProgress() {
+  document.getElementById('genProgress').classList.remove('visible');
+}
+
+async function preGenerateChannel(channelId) {
+  if (!keys.yt || !keys.claude) return;
+
+  var ch = channels.find(function(c) { return c.id === channelId; });
+  if (!ch) return;
+  var level = ch.detailLevel || 'tldr';
+
+  try {
+    showGenProgress('Fetching videos for ' + ch.title + '...', 5);
+    var videos = await fetchChannelVideos(channelId);
+    if (videos.length === 0) { hideGenProgress(); return; }
+
+    var needsTranscript = (level === 'narration');
+
+    for (var i = 0; i < videos.length; i++) {
+      var v = videos[i];
+      if (!summaryCache[v.id]) summaryCache[v.id] = {};
+
+      // Skip if already cached for this level
+      if (summaryCache[v.id][level]) continue;
+
+      var pct = 10 + Math.round((i / videos.length) * 85);
+      showGenProgress('Generating ' + DETAIL_LEVELS[level].label + ' (' + (i+1) + '/' + videos.length + ')...', pct);
+
+      if (needsTranscript) {
+        // Get transcript first
+        var transcript = await fetchTranscript(v.id);
+        if (transcript) {
+          summaryCache[v.id][level] = await generateSummary(v, level, transcript);
+        } else {
+          summaryCache[v.id][level] = '⚠ Transcript unavailable for this video.';
+        }
+      } else {
+        summaryCache[v.id][level] = await generateSummary(v, level, null);
+      }
+
+      saveSummaries();
+    }
+
+    showGenProgress('Done!', 100);
+    setTimeout(hideGenProgress, 1200);
+    renderFeed();
+
+  } catch (err) {
+    console.error('Pre-gen error:', err);
+    showGenProgress('Error: ' + err.message, 100);
+    setTimeout(hideGenProgress, 3000);
+  }
+}
+
+async function fetchTranscript(videoId) {
+  if (!keys.apify) return null;
+  try {
+    var res = await fetch('https://api.apify.com/v2/acts/karamelo~youtube-transcripts/run-sync-get-dataset-items?token=' + keys.apify, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        urls: ['https://www.youtube.com/watch?v=' + videoId],
+        outputFormat: 'singleStringText'
+      })
+    });
+    if (!res.ok) return null;
+    var data = await res.json();
+    if (!data || data.length === 0) return null;
+    var item = data[0];
+    var t = item.text || item.transcript || item.content || '';
+    if (!t) {
+      for (var k in item) {
+        if (typeof item[k] === 'string' && item[k].length > t.length) t = item[k];
+      }
+    }
+    return t && t.length > 30 ? t : null;
+  } catch (e) {
+    console.error('Transcript error:', e);
+    return null;
+  }
+}
+
+async function generateSummary(video, level, transcript) {
+  var prompt = '';
+
+  if (level === 'tldr') {
+    prompt = 'Write a 1-2 sentence TLDR for this YouTube video. Be extremely concise — capture the single core takeaway.\n\nTitle: ' + video.title + '\nChannel: ' + video.channelTitle + '\nDescription: ' + (video.description || '').substring(0, 800);
+  } else if (level === 'brief') {
+    prompt = 'Write a 3-4 sentence summary of this YouTube video. Include the main topic, key points, and conclusion. Be informative but concise.\n\nTitle: ' + video.title + '\nChannel: ' + video.channelTitle + '\nDescription: ' + (video.description || '').substring(0, 800);
+    if (transcript) {
+      prompt += '\n\nTranscript excerpt: ' + transcript.substring(0, 3000);
+    }
+  } else if (level === 'narration') {
+    prompt = 'You are the narrator for the YouTube channel "' + video.channelTitle + '". Write a detailed, engaging narration of this video as if you are telling the story of what happens in the video. Write in the voice/style of the channel. Use paragraphs, be vivid, cover all major points and examples. The reader should feel like they watched the video after reading this. 5-8 paragraphs.\n\nTitle: ' + video.title;
+    if (transcript) {
+      prompt += '\n\nFull transcript:\n' + transcript.substring(0, 12000);
+    } else {
+      prompt += '\nDescription: ' + (video.description || '').substring(0, 1500);
+    }
+  }
+
+  var maxTokens = level === 'tldr' ? 150 : level === 'brief' ? 400 : 2000;
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': keys.claude,
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) return '⚠ API error ' + res.status;
+
+    var data = await res.json();
+    var text = '';
+    for (var i = 0; i < data.content.length; i++) {
+      if (data.content[i].type === 'text') text += data.content[i].text;
+    }
+    return text.trim() || '⚠ Empty response';
+  } catch (e) {
+    return '⚠ ' + e.message;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  FEED RENDERING
+// ═══════════════════════════════════════════
 async function renderFeed() {
   var feedEl = document.getElementById('feed');
 
@@ -1206,7 +1187,7 @@ async function renderFeed() {
   }
 
   if (!keys.yt) {
-    feedEl.innerHTML = '<div class="feed-empty"><div class="emoji">🔑</div><h2>API Keys Needed</h2><p>Go to Settings and add your API keys to get started.</p></div>';
+    feedEl.innerHTML = '<div class="feed-empty"><div class="emoji">🔑</div><h2>API Keys Needed</h2><p>Go to Settings and add your API keys.</p></div>';
     return;
   }
 
@@ -1221,11 +1202,11 @@ async function renderFeed() {
       var ch = targetChannels[i];
       vids.forEach(function(v) {
         v._channelThumb = ch.thumb;
+        v._detailLevel = ch.detailLevel || 'tldr';
       });
       allVideos = allVideos.concat(vids);
     }
 
-    // Sort by date, newest first
     allVideos.sort(function(a, b) { return new Date(b.publishedAt) - new Date(a.publishedAt); });
 
     if (allVideos.length === 0) {
@@ -1233,13 +1214,9 @@ async function renderFeed() {
       return;
     }
 
-    // Generate brief captions with Claude
     feedEl.innerHTML = '';
     for (var j = 0; j < allVideos.length; j++) {
-      var card = buildCard(allVideos[j]);
-      feedEl.appendChild(card);
-      // Generate brief caption async
-      generateBriefCaption(allVideos[j]);
+      feedEl.appendChild(buildCard(allVideos[j]));
     }
 
   } catch (err) {
@@ -1250,11 +1227,19 @@ async function renderFeed() {
 function buildCard(video) {
   var card = document.createElement('div');
   card.className = 'card';
-  card.setAttribute('data-vid', video.id);
 
-  var briefId = 'brief-' + video.id;
-  var detailId = 'detail-' + video.id;
-  var cached = summaryCache[video.id];
+  var level = video._detailLevel || 'tldr';
+  var cached = summaryCache[video.id] && summaryCache[video.id][level];
+  var levelInfo = DETAIL_LEVELS[level];
+
+  var contentHtml = '';
+  if (cached) {
+    contentHtml = '<span class="detail-badge ' + levelInfo.badge + '">' + levelInfo.label + '</span>\n' + escHtml(cached);
+  } else {
+    contentHtml = '<div class="content-loading"><div class="mini-spinner"></div> Generating ' + levelInfo.label + '...</div>';
+  }
+
+  var isNarration = (level === 'narration');
 
   card.innerHTML = '' +
     '<div class="card-header">' +
@@ -1271,188 +1256,57 @@ function buildCard(video) {
     '</div>' +
     '<div class="card-body">' +
       '<div class="card-title">' + escHtml(video.title) + '</div>' +
-      '<div class="card-caption collapsed" id="' + briefId + '">' +
-        (cached && cached.brief ? cached.brief : '<span style="color:var(--text3)">Generating summary...</span>') +
-      '</div>' +
-      '<button class="read-more-btn" data-vid="' + video.id + '">Read more</button>' +
     '</div>' +
-    '<div class="card-detail" id="' + detailId + '"></div>' +
+    '<div class="card-content' + (isNarration ? ' narration' : '') + '" id="content-' + video.id + '">' +
+      contentHtml +
+    '</div>' +
     '<div class="card-actions">' +
       '<button class="card-action-btn" data-play="' + video.id + '">▶ Watch</button>' +
       '<button class="card-action-btn" data-share="' + video.id + '">↗ Share</button>' +
     '</div>';
 
-  // Event: play video from thumb
   card.querySelector('.card-thumb').addEventListener('click', function() {
     playVideo(this.getAttribute('data-vid'));
   });
 
-  // Event: play button
   card.querySelector('[data-play]').addEventListener('click', function() {
     playVideo(this.getAttribute('data-play'));
   });
 
-  // Event: share
   card.querySelector('[data-share]').addEventListener('click', function() {
     var vid = this.getAttribute('data-share');
     var url = 'https://youtu.be/' + vid;
-    if (navigator.share) {
-      navigator.share({ url: url });
-    } else {
-      navigator.clipboard.writeText(url);
-      toast('Link copied');
-    }
+    if (navigator.share) { navigator.share({ url: url }); }
+    else { navigator.clipboard.writeText(url); toast('Link copied'); }
   });
 
-  // Event: read more
-  card.querySelector('.read-more-btn').addEventListener('click', function() {
-    var vid = this.getAttribute('data-vid');
-    var detailEl = document.getElementById('detail-' + vid);
-    var captionEl = document.getElementById('brief-' + vid);
-    if (detailEl.classList.contains('visible')) {
-      detailEl.classList.remove('visible');
-      captionEl.classList.add('collapsed');
-      this.textContent = 'Read more';
-    } else {
-      captionEl.classList.remove('collapsed');
-      this.textContent = 'Show less';
-      loadFullSummary(vid, detailEl);
-    }
-  });
+  // If not cached, generate inline (fallback for edge cases)
+  if (!cached) {
+    generateInline(video, level);
+  }
 
   return card;
 }
 
-// ═══════════════════════════════════════════
-//  AI SUMMARIES
-// ═══════════════════════════════════════════
-async function generateBriefCaption(video) {
-  if (summaryCache[video.id] && summaryCache[video.id].brief) return;
+async function generateInline(video, level) {
+  var needsTranscript = (level === 'narration');
+  var transcript = null;
 
-  if (!keys.claude) return;
-
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': keys.claude,
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
-        messages: [{
-          role: 'user',
-          content: 'Write a 2-sentence Instagram-style caption for this YouTube video. Be concise and engaging.\n\nTitle: ' + video.title + '\nChannel: ' + video.channelTitle + '\nDescription: ' + (video.description || '').substring(0, 500)
-        }]
-      })
-    });
-
-    if (!res.ok) return;
-    var data = await res.json();
-    var brief = '';
-    for (var i = 0; i < data.content.length; i++) {
-      if (data.content[i].type === 'text') brief += data.content[i].text;
-    }
-    brief = brief.trim();
-
-    if (!summaryCache[video.id]) summaryCache[video.id] = {};
-    summaryCache[video.id].brief = brief;
-    localStorage.setItem('tr_summaries', JSON.stringify(summaryCache));
-
-    var el = document.getElementById('brief-' + video.id);
-    if (el) el.textContent = brief;
-  } catch (e) {
-    console.error('Brief caption error:', e);
-  }
-}
-
-async function loadFullSummary(videoId, detailEl) {
-  if (summaryCache[videoId] && summaryCache[videoId].full) {
-    detailEl.innerHTML = '<div class="detail-summary">' + escHtml(summaryCache[videoId].full) + '</div>';
-    detailEl.classList.add('visible');
-    return;
+  if (needsTranscript) {
+    transcript = await fetchTranscript(video.id);
   }
 
-  detailEl.innerHTML = '<div class="detail-loading"><div class="mini-spinner"></div> Fetching transcript & generating detailed summary...</div>';
-  detailEl.classList.add('visible');
+  var text = await generateSummary(video, level, transcript);
 
-  if (!keys.apify || !keys.claude) {
-    detailEl.innerHTML = '<div class="detail-loading">Set API keys in Settings first.</div>';
-    return;
-  }
+  if (!summaryCache[video.id]) summaryCache[video.id] = {};
+  summaryCache[video.id][level] = text;
+  saveSummaries();
 
-  try {
-    // Step 1: Get transcript via Apify
-    var apifyUrl = 'https://api.apify.com/v2/acts/karamelo~youtube-transcripts/run-sync-get-dataset-items?token=' + keys.apify;
-    var apifyRes = await fetch(apifyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        urls: ['https://www.youtube.com/watch?v=' + videoId],
-        outputFormat: 'singleStringText'
-      })
-    });
-
-    if (!apifyRes.ok) throw new Error('Apify error ' + apifyRes.status);
-
-    var apifyData = await apifyRes.json();
-    var transcript = '';
-    if (apifyData && apifyData.length > 0) {
-      var item = apifyData[0];
-      transcript = item.text || item.transcript || item.content || '';
-      if (!transcript) {
-        // Find longest string
-        for (var k in item) {
-          if (typeof item[k] === 'string' && item[k].length > transcript.length) {
-            transcript = item[k];
-          }
-        }
-      }
-    }
-
-    if (!transcript || transcript.length < 30) {
-      throw new Error('No transcript available for this video.');
-    }
-
-    // Step 2: Summarize with Claude
-    var claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': keys.claude,
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{
-          role: 'user',
-          content: 'Summarize this YouTube video transcript in 3-5 clear paragraphs. Include the main points, key insights, and conclusions. Write for someone who wants to understand the video without watching it.\n\nTranscript:\n' + transcript.substring(0, 12000)
-        }]
-      })
-    });
-
-    if (!claudeRes.ok) throw new Error('Claude API error ' + claudeRes.status);
-
-    var claudeData = await claudeRes.json();
-    var fullSummary = '';
-    for (var i = 0; i < claudeData.content.length; i++) {
-      if (claudeData.content[i].type === 'text') fullSummary += claudeData.content[i].text;
-    }
-    fullSummary = fullSummary.trim();
-
-    if (!summaryCache[videoId]) summaryCache[videoId] = {};
-    summaryCache[videoId].full = fullSummary;
-    localStorage.setItem('tr_summaries', JSON.stringify(summaryCache));
-
-    detailEl.innerHTML = '<div class="detail-summary">' + escHtml(fullSummary) + '</div>';
-
-  } catch (err) {
-    detailEl.innerHTML = '<div class="detail-loading" style="color:var(--accent);">⚠ ' + escHtml(err.message) + '</div>';
+  var el = document.getElementById('content-' + video.id);
+  if (el) {
+    var levelInfo = DETAIL_LEVELS[level];
+    el.innerHTML = '<span class="detail-badge ' + levelInfo.badge + '">' + levelInfo.label + '</span>\n' + escHtml(text);
+    if (level === 'narration') el.classList.add('narration');
   }
 }
 
@@ -1476,7 +1330,6 @@ loadState();
 renderStories();
 renderFeed();
 
-// Show settings if no keys
 if (!keys.yt || !keys.claude || !keys.apify) {
   showScreen('settingsScreen');
 }
